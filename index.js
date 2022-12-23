@@ -293,5 +293,5 @@ console.log(request.params.movie , request.params.selected , request.params.tota
     }
   }
 );
-//Port
-app.listen(process.env.PORT || 3002);
+//Running port
+app.listen(process.env.PORT || 3001);
