@@ -14,11 +14,10 @@ const jwt = require("jsonwebtoken");
 app.use(express.json());
 app.use(
   cors({
-    origin: "*",
-    credentials:true
+    origin: "*"
   })
 );
-app.get("/",(req,res)=>res.send('Server Running'));
+
 let authenticate = function (request, response, next) {
   console.log(request.headers);
   if (request.headers.authorization) {
@@ -105,7 +104,7 @@ let authenticateAdmin = function (request, response, next) {
 app.post("/register", async function (request, response) {
   try {
     const connection = await mongoClient.connect(URL);
-    const db = connection.db("bookMyShow"); 
+    const db = connection.db("moviecollection"); 
     const salt = await bcrypt.genSalt(10);
     //console.log(salt);
      const hash = await bcrypt.hash(request.body.password, salt);
@@ -123,7 +122,7 @@ app.post("/register", async function (request, response) {
 app.post("/", async function (request, response) {
   try {
     const connection = await mongoClient.connect(URL);
-    const db = connection.db("bookMyShow");
+    const db = connection.db("moviecollection");
     const user = await db
       .collection("users")
       .findOne({ username: request.body.username });
@@ -161,7 +160,7 @@ app.post("/", async function (request, response) {
 app.post("/admin-dashboard", authenticate, async function (request, response) {
   try {
     const connection = await mongoClient.connect(URL);
-    const db = connection.db("bookMyShow");
+    const db = connection.db("moviecollection");
     request.body.userid = mongodb.ObjectId(request.userid);
     await db.collection("movies").insertOne(request.body);
     await connection.close();
@@ -179,7 +178,7 @@ app.get(
   async function (request, response) {
     try {
       const connection = await mongoClient.connect(URL);
-      const db = connection.db("bookMyShow");
+      const db = connection.db("moviecollection");
       let movies = await db
         .collection("movies")
         .find({ userid: mongodb.ObjectId(request.userid) })
@@ -196,7 +195,7 @@ app.get(
 app.get("/dashboard", authenticateUser, async function (request, response) {
   try {
     const connection = await mongoClient.connect(URL);
-    const db = connection.db("bookMyShow");
+    const db = connection.db("moviecollection");
     let movies = await db.collection("movies").find().toArray();
     //   .find({ userid: mongodb.ObjectId(request.userid) })
     //   .toArray();
@@ -209,7 +208,7 @@ app.get("/dashboard", authenticateUser, async function (request, response) {
 app.get("/admin-dashboard/:id", authenticateAdmin, async function (req, res) {
   try {
     const connection = await mongoClient.connect(URL);
-    const db = connection.db("bookMyShow");
+    const db = connection.db("moviecollection");
     let movie = await db
       .collection("movies")
       .findOne({ _id: mongodb.ObjectId(req.params.id) });
@@ -225,7 +224,7 @@ app.get("/admin-dashboard/:id", authenticateAdmin, async function (req, res) {
 app.put("/admin-dashboard/:id",  async function (req, res) {
   try {
     const connection = await mongoClient.connect(URL);
-    const db = connection.db("bookMyShow");
+    const db = connection.db("moviecollection");
     await db
       .collection("movies")
       .updateOne({ _id: mongodb.ObjectId(req.params.id) }, { $set: req.body });
@@ -241,7 +240,7 @@ app.delete(
   async function (req, res) {
     try {
       const connection = await mongoClient.connect(URL);
-      const db = connection.db("bookMyShow");
+      const db = connection.db("moviecollection");
       await db
         .collection("movies")
         .deleteOne({ _id: mongodb.ObjectId(req.params.id) });
@@ -271,7 +270,7 @@ console.log(request.params.movie , request.params.selected , request.params.tota
       var mailOptions = {
         from: "testnodemail04@gmail.com",
         to: mailid,
-        subject: "BookMyShow",
+        subject: "moviecollection",
         text: `Your Ticket`,
         html: `<div><h3>Book My Show</h3><h5>${request.params.movie}</h5><p>${request.params.selected}</p><small>₹${request.params.totalprice}</small></div>`,
       };
@@ -295,4 +294,4 @@ console.log(request.params.movie , request.params.selected , request.params.tota
   }
 );
 //Port
-app.listen(process.env.PORT || 3001);
+app.listen(process.env.PORT || 3002);
